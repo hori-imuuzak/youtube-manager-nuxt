@@ -24,40 +24,37 @@ import AppVideo from '~/components/AppVideo'
 export default {
   components: { AppVideo },
 
-  async fetch({ store }: any) {
+  async fetch({ store, query }: any) {
+    const q = encodeURIComponent(query.q) || ''
     const payload = {
-      uri: ROUTES.GET.POPULARS,
+      uri: ROUTES.GET.SEARCH,
+      q,
     }
 
-    if (
-      store.getters.getPopularVideos &&
-      store.getters.getPopularVideos.length > 0
-    ) {
-      return
-    }
-
-    await store.dispatch('fetchPopularVideos', payload)
+    await store.dispatch('searchVideos', payload)
   },
 
   computed: {
     items() {
-      return this.$store.getters.getPopularVideos
+      return this.$store.getters.getSearchVideos
     },
     nextPageToken() {
-      return this.$store.getters.getMeta.nextPageToken
+      return this.$store.getters.getSearchMeta.nextPageToken
     },
   },
 
   methods: {
     loadMore() {
+      const q = encodeURIComponent(this.$route.query.q) || ''
       const payload = {
-        uri: ROUTES.GET.POPULARS,
+        uri: ROUTES.GET.SEARCH,
         params: {
           pageToken: this.nextPageToken,
+          q,
         },
       }
 
-      this.$store.dispatch('fetchPopularVideos', payload)
+      this.$store.dispatch('searchVideos', payload)
     },
   },
 }
